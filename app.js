@@ -1,5 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+// const rateLimit = require('express-rate-limit');
 
 import { PORT } from './config/env.js';
 
@@ -8,6 +9,7 @@ import authRouter from './routes/auth.routes.js';
 import subscriptionRouter from './routes/subscription.router.js';
 import connectDB from './database/mongodb.js';
 import errorMiddleware from './middlewares/error.middleware.js';
+import arcjetMiddleware from './middlewares/arcjet.middleware.js';
 
 // Initialize Express app
 const app = express();
@@ -16,6 +18,16 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser());
+
+app.use(arcjetMiddleware);
+
+// limit requests from same API
+// const limiter = rateLimit({
+//   max: 100, // max number of requests
+//   windowMs: 60 * 60 * 1000, // time window in milliseconds
+//   message: 'Too many requests from this IP, please try again in an hour!',
+// });
+// app.use('/api', limiter); // apply rate limiting to all /api routes
 
 // Route setup
 app.use('/api/v1/auth', authRouter);
