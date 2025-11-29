@@ -6,7 +6,7 @@ import { PORT } from './config/env.js';
 
 import userRouter from './routes/user.routes.js';
 import authRouter from './routes/auth.routes.js';
-import subscriptionRouter from './routes/subscription.router.js';
+import subscriptionRouter from './routes/subscription.routes.js';
 import connectDB from './database/mongodb.js';
 import errorMiddleware from './middlewares/error.middleware.js';
 import arcjetMiddleware from './middlewares/arcjet.middleware.js';
@@ -25,6 +25,12 @@ app.use(arcjetMiddleware);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/subscriptions', subscriptionRouter);
+// app.use('/api/v1/', indexRouter);
+// app.use('/api/v1/categories', categoryRouter);
+// app.use('/api/v1/analytics', analyticsRouter);
+// app.use('/api/v1/reminders', reminderRouter);
+// app.use('/api/v1/payments', paymentRouter);
+// app.use('/api/v1/admin', adminRouter);
 
 // Error handling middleware
 app.use(errorMiddleware);
