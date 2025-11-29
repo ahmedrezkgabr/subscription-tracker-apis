@@ -66,3 +66,8 @@ export const getUserSubscriptions = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateSubscription = async (req, res, next) => {};
+export const deleteSubscription = async (req, res, next) => {};
+export const cancelSubscription = async (req, res, next) => {};
+export const getUpcomingRenewals = async (req, res, next) => {};

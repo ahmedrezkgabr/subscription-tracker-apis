@@ -5,33 +5,21 @@ import {
   getSubscription,
   getSubscriptions,
   getUserSubscriptions,
+  updateSubscription,
+  deleteSubscription,
+  cancelSubscription,
+  getUpcomingRenewals,
 } from '../controllers/subscription.controller.js';
-import { get } from 'mongoose';
 
 const subscriptionRouter = Router();
 
 subscriptionRouter.get('/', getSubscriptions);
 subscriptionRouter.get('/:id', getSubscription);
 subscriptionRouter.post('/', authorize, createSubscription);
-
-subscriptionRouter.put('/:id', (req, res) => {
-  res.send({ title: `UPDATE subscription with ID: ${req.params.id}` });
-});
-
-subscriptionRouter.delete('/:id', (req, res) => {
-  res.send({ title: `DELETE subscription with ID: ${req.params.id}` });
-});
-
+subscriptionRouter.put('/:id', updateSubscription);
+subscriptionRouter.delete('/:id', deleteSubscription);
 subscriptionRouter.get('/user/:userId', authorize, getUserSubscriptions);
-
-subscriptionRouter.put('/user/:userId/cancel', (req, res) => {
-  res.send({
-    title: `CANCEL subscription for user with ID: ${req.params.userId}`,
-  });
-});
-
-subscriptionRouter.get('/upcoming-renewals', (req, res) => {
-  res.send({ title: 'GET upcoming subscription renewals' });
-});
+subscriptionRouter.put('/user/:userId/cancel', cancelSubscription);
+subscriptionRouter.get('/upcoming-renewals', getUpcomingRenewals);
 
 export default subscriptionRouter;
