@@ -21,14 +21,6 @@ app.use(cookieParser());
 
 app.use(arcjetMiddleware);
 
-// limit requests from same API
-// const limiter = rateLimit({
-//   max: 100, // max number of requests
-//   windowMs: 60 * 60 * 1000, // time window in milliseconds
-//   message: 'Too many requests from this IP, please try again in an hour!',
-// });
-// app.use('/api', limiter); // apply rate limiting to all /api routes
-
 // Route setup
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
