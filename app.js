@@ -15,7 +15,7 @@ import arcjetMiddleware from './middlewares/arcjet.middleware.js';
 const app = express();
 
 // Middleware setup
-app.use(express.json());
+app.use(express.json({ limit: '10kb' })); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser());
 
@@ -29,14 +29,25 @@ app.use('/api/v1/subscriptions', subscriptionRouter);
 // Error handling middleware
 app.use(errorMiddleware);
 
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
-
 // Start the server
 app.listen(PORT, async () => {
   console.log(`Subdub API is running on http://localhost:${PORT}`);
   await connectDB();
+});
+
+// Global error handlers
+process.on('unhandledRejection', (error) => {
+  console.log('UNHANLED REJECTION\nSHUTTING DOWN...');
+  console.log(error.name, error.message);
+
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  console.log('UNCAUGHT EXCEPTION\nSHUTTING DOWN...');
+  console.log(error.name, error.message);
+
+  process.exit(1);
 });
 
 export default app;
