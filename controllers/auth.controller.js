@@ -2,9 +2,37 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-import { JWT_SECRET, JWT_EXPIRES_IN } from '../config/env.js';
+import { JWT_SECRET, JWT_EXPIRES_IN, NODE_ENV } from '../config/env.js';
 
 import User from '../models/user.model.js';
+
+const signToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken({ id: user._id }, JWT_SECRET);
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + JWT_EXPIRES_IN * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+  };
+  if (NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
+  // remove password from output
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
 
 export const signUp = async (req, res, next) => {
   // start a mongoose session for transaction (atomicity)
@@ -32,18 +60,8 @@ export const signUp = async (req, res, next) => {
       { session }
     );
 
-    const token = jwt.sign({ id: newUsers[0]._id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      data: {
-        user: newUsers[0],
-        token,
-      },
-    });
+    // generate JWT token
+    createSendToken(newUsers[0], 201, res);
 
     // commit the transaction
     await session.commitTransaction();
@@ -75,18 +93,7 @@ export const signIn = async (req, res, next) => {
     }
 
     // generate JWT token
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'User signed in successfully',
-      data: {
-        user,
-        token,
-      },
-    });
+    createSendToken(user, 200, res);
   } catch (error) {
     next(error);
   }

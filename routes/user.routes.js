@@ -7,11 +7,14 @@ import {
   createUser,
   deleteUser,
 } from '../controllers/user.controller.js';
-import authorize from '../middlewares/auth.middleware.js';
+import { authorize, restrictTo } from '../middlewares/auth.middleware.js';
 
 const userRouter = Router();
 
-userRouter.route('/').get(getUsers).post(createUser);
+userRouter
+  .route('/')
+  .get(authorize, restrictTo('admin'), getUsers)
+  .post(createUser);
 userRouter
   .route('/:id')
   .get(authorize, getUser)

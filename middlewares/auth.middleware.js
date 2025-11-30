@@ -3,7 +3,20 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/env.js';
 import User from '../models/user.model.js';
 
-const authorize = async (req, res, next) => {
+// wrapper function to return middleware function we want
+export const restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    // roles is an array i.e ['admin', 'lead-guide']
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new Error('You do not have permission to perform this action', 403)
+      );
+    }
+    next();
+  };
+
+export const authorize = async (req, res, next) => {
   try {
     let token;
     if (
@@ -32,5 +45,3 @@ const authorize = async (req, res, next) => {
       .json({ success: false, message: 'Unauthorized', error: error.message });
   }
 };
-
-export default authorize;
