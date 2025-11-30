@@ -13,6 +13,7 @@ import {
 
 const subscriptionRouter = Router();
 
+// api/v1/subscriptions
 subscriptionRouter.route('/').get(getSubscriptions).post(createSubscription);
 subscriptionRouter
   .route('/:id')

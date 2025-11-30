@@ -1,15 +1,12 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-// const rateLimit = require('express-rate-limit');
 
 import { PORT } from './config/env.js';
 
-import userRouter from './routes/user.routes.js';
-import authRouter from './routes/auth.routes.js';
-import subscriptionRouter from './routes/subscription.routes.js';
 import connectDB from './database/mongodb.js';
 import errorMiddleware from './middlewares/error.middleware.js';
-import arcjetMiddleware from './middlewares/arcjet.middleware.js';
+// import arcjetMiddleware from './middlewares/arcjet.middleware.js';
+import indexRouter from './routes/index.routes.js';
 
 // Initialize Express app
 const app = express();
@@ -19,18 +16,10 @@ app.use(express.json({ limit: '10kb' })); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(cookieParser());
 
-app.use(arcjetMiddleware);
+// app.use(arcjetMiddleware);
 
 // Route setup
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/subscriptions', subscriptionRouter);
-// app.use('/api/v1/', indexRouter);
-// app.use('/api/v1/categories', categoryRouter);
-// app.use('/api/v1/analytics', analyticsRouter);
-// app.use('/api/v1/reminders', reminderRouter);
-// app.use('/api/v1/payments', paymentRouter);
-// app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/', indexRouter);
 
 // Error handling middleware
 app.use(errorMiddleware);
