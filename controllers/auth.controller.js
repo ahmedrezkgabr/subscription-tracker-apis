@@ -99,4 +99,14 @@ export const signIn = async (req, res, next) => {
   }
 };
 
-export const singOut = async (req, res, next) => {};
+export const singOut = async (req, res, next) => {
+  try {
+    res.cookie('jwt', 'loggedout', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true,
+    });
+    res.status(200).json({ status: 'success' });
+  } catch (error) {
+    next(error);
+  }
+};
