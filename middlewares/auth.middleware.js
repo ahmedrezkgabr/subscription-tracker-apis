@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { promisify } from 'util';
 
 import { JWT_SECRET } from '../config/env.js';
 import User from '../models/user.model.js';
@@ -19,6 +20,8 @@ export const restrictTo =
 export const authorize = async (req, res, next) => {
   try {
     let token;
+
+    // Extract Bearer token
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith('Bearer')
@@ -27,21 +30,32 @@ export const authorize = async (req, res, next) => {
     }
 
     if (!token) {
-      const error = new Error('Not authorized to access this route');
-      error.statusCode = 401;
-      throw error;
+      return res.status(401).json({
+        success: false,
+        message: 'Not authorized - No token provided',
+      });
     }
 
-    // verify token
-    const decoded = jwt.verify(token, JWT_SECRET);
+    // Verify token
+    const decoded = await promisify(jwt.verify)(token, JWT_SECRET);
+    const { id } = decoded.id;
+    const currentUser = await User.findById(id);
+    if (!currentUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'The user belonging to this token no longer exists.',
+      });
+    }
 
-    // check if the user still exists & attach user to req object
-    req.user = await User.findById(decoded.id).select('-password');
+    // Attach the user object to req
+    req.user = currentUser;
 
     next();
   } catch (error) {
-    res
-      .status(401)
-      .json({ success: false, message: 'Unauthorized', error: error.message });
+    return res.status(401).json({
+      success: false,
+      message: 'Unauthorized',
+      error: error.message,
+    });
   }
 };
